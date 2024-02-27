@@ -16,7 +16,7 @@ namespace Shared.Logging.Loggers
 
         protected override void LogImpl(string message)
         {
-            string path = _path;
+            string path = _path + "\\Logs";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -24,7 +24,7 @@ namespace Shared.Logging.Loggers
 
             //string filepath = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
 
-            string filepath = path + "\\Logs\\" + _serviceName + "ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
+            string filepath = path + "\\" + _serviceName + "ServiceLog_" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
 
             if (!File.Exists(filepath))
             {

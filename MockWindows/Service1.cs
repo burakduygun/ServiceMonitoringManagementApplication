@@ -1,14 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
+﻿using Shared.Logging;
 using System.IO;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace MockWindows
@@ -17,26 +9,29 @@ namespace MockWindows
     {
         //Timer timer = new Timer();
 
-        private readonly ILogger _logger;
-
-        public Service1(ILogger logger)
+        private readonly AbstractLogger _logger;
+        private readonly string _watchingPath;
+        public Service1(AbstractLogger logger, string watchingPath)
         {
             _logger = logger;
+            _watchingPath = watchingPath;
+            _logger.SetLogLevel(LogLevel.Info);
             InitializeComponent();
         }
 
         protected override void OnStart(string[] args)
         {
             //WriteToFile("Service is started at " + DateTime.Now);
-            _logger.LogInformation("service is started");
+            _logger.Info("service is started");
 
             FileSystemWatcher Watcher = new FileSystemWatcher();
             //Watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            Watcher.Path = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop";
+            Watcher.Path = _watchingPath;
             Watcher.IncludeSubdirectories = true;
             Watcher.Created += new FileSystemEventHandler(Wathcer_Changed);
             Watcher.Deleted += new FileSystemEventHandler(Wathcer_Changed);
             Watcher.EnableRaisingEvents = true;
+            
             //timer.Elapsed += new ElapsedEventHandler(OnElapsedTime);
             //timer.Interval = 3000;
             //timer.Enabled = true;
@@ -45,13 +40,13 @@ namespace MockWindows
         protected override void OnStop()
         {
             //WriteToFile("Service is stopped at " + DateTime.Now);
-            _logger.LogInformation("Service is stopped");
+            _logger.Info("Service is stopped");
         }
 
         private void OnElapsedTime(object source, ElapsedEventArgs e)
         {
             //WriteToFile("Service is recall at " + DateTime.Now);
-            _logger.LogInformation("Service is recall");
+            _logger.Info("Service is recall");
 
         }
 
@@ -82,7 +77,7 @@ namespace MockWindows
 
         void Wathcer_Changed(object sender, FileSystemEventArgs e)
         {
-            _logger.LogInformation($"Change Type = {e.ChangeType}, Path = {e.FullPath}");
+            _logger.Info($"Change Type = {e.ChangeType}, Path = {e.FullPath}");
         }
     }
 }

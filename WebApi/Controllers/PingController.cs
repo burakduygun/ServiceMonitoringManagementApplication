@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Logging;
 
 namespace WebApi.Controllers
 {
@@ -7,8 +8,8 @@ namespace WebApi.Controllers
     [ApiController]
     public class PingController : ControllerBase
     {
-        private readonly ILogger _logger;
-        public PingController(ILogger logger)
+        private readonly AbstractLogger _logger;
+        public PingController(AbstractLogger logger)
         {
             _logger = logger;
         }
@@ -16,7 +17,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public string Ping()
         {
-            _logger.LogInformation("Ping get isteği geldi.");
+            _logger.Info("Ping get isteği geldi.");
 
             return "Ping başarılı";
         }

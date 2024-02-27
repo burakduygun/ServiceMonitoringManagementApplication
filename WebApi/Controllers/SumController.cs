@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Logging;
 
 namespace WebApi.Controllers
 {
@@ -7,16 +8,16 @@ namespace WebApi.Controllers
     [ApiController]
     public class SumController : ControllerBase
     {
-        private readonly ILogger _logger;
-        public SumController(ILogger logger)
+        private readonly AbstractLogger _logger;
+        public SumController(AbstractLogger logger)
         {
             _logger = logger;
         }
-
         [HttpGet]
         public int Sum(int x, int y)
         {
-            _logger.LogInformation("Sum get isteği geldi.");
+            _logger.Info("Sum get isteği geldi.");
+
             return x + y;
         }
 
