@@ -17,13 +17,13 @@ namespace MockWindows
         static void Main()
         {
             ServiceBase[] ServicesToRun;
-            // log nereye atılcak
 
             string fileLoggingPath = ConfigurationManager.AppSettings["FileLoggingPath"];
             string fileLoggingServiceName = ConfigurationManager.AppSettings["FileLoggingServiceName"];
             string fileLoggingLogLevel = ConfigurationManager.AppSettings["FileLoggingLogLevel"];
             string watchingPath = ConfigurationManager.AppSettings["WatchingPath"];
 
+            // log nereye atılcak
             //var logger = new FileLogger("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop", "MockWindows");
             var logger = new FileLogger(fileLoggingPath, fileLoggingServiceName);
 

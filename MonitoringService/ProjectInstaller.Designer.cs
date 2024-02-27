@@ -1,4 +1,4 @@
-﻿namespace MockWindows
+﻿namespace MonitoringService
 {
     partial class ProjectInstaller
     {
@@ -32,16 +32,16 @@
             this.serviceInstaller1 = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller1
-            // 
+            //
             this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.serviceProcessInstaller1.Password = null;
             this.serviceProcessInstaller1.Username = null;
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "Mock Windows demo";
-            this.serviceInstaller1.DisplayName = "MockWindows.Demo";
-            this.serviceInstaller1.ServiceName = "MockWindows";
+            this.serviceInstaller1.Description = "MonitoringService demo";
+            this.serviceInstaller1.DisplayName = "MonitoringService.Demo";
+            this.serviceInstaller1.ServiceName = "MonitoringService";
             // 
             // ProjectInstaller
             // 

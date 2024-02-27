@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
+using System.Configuration;
+using Shared.Logging.Loggers;
+using System;
 
 namespace MonitoringService
 {
@@ -15,9 +13,18 @@ namespace MonitoringService
         static void Main()
         {
             ServiceBase[] ServicesToRun;
+
+            string fileLoggingPath = ConfigurationManager.AppSettings["FileLoggingPath"];
+            string fileLoggingServiceName = ConfigurationManager.AppSettings["FileLoggingServiceName"];
+            string fileLoggingLogLevel = ConfigurationManager.AppSettings["FileLoggingLogLevel"];
+
+            var logger = new FileLogger(fileLoggingPath, fileLoggingServiceName);
+
+            logger.SetLogLevel((Shared.Logging.LogLevel)Enum.Parse(typeof(Shared.Logging.LogLevel), fileLoggingLogLevel));
+
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new Service1(logger)
             };
             ServiceBase.Run(ServicesToRun);
         }

@@ -19,7 +19,7 @@ namespace WebApi.Controllers
             return _logger.GetLogLevel().ToString();
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult Post(string logLevel)
         {
             try

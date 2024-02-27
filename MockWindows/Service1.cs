@@ -15,7 +15,6 @@ namespace MockWindows
         {
             _logger = logger;
             _watchingPath = watchingPath;
-            _logger.SetLogLevel(LogLevel.Info);
             InitializeComponent();
         }
 
