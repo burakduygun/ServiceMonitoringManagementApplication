@@ -8,15 +8,17 @@ using System.Net;
 using Microsoft.Web.Administration;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
+using Shared.Services;
+using System.Text.Json;
 
 namespace MonitoringService
 {
     public partial class Service1 : ServiceBase
     {
-        private Timer timer;
+        private List<Timer> timers = new List<Timer>();
         private readonly AbstractLogger _logger;
-        private string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "settings", "data.txt");
-        private string serviceName;
+        private string filePath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
 
         public Service1(AbstractLogger logger)
         {
@@ -26,105 +28,89 @@ namespace MonitoringService
 
         protected override void OnStart(string[] args)
         {
-            timer = new Timer();
-            //timer.Interval = 10000;
+            try
+            {
+                var serviceSettings = ReadServiceSettings(filePath);
 
-            CheckServices(null, null); // Servis başlatıldığında ilk kontrolü yapması için
-            StartTimerFromSettings(); // Timer interval değerini dosyadan ayarla
-            serviceName = GetServiceNameFromSettings(); // servicenamesini al settingsten
+                ApplySettings(serviceSettings);
 
-            timer.Elapsed += CheckServices;
-            timer.Start();
-            _logger.Info("Monitoring service is running.");
+                _logger.Info("Monitoring servis başlatılıyor.");
 
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = Path.GetDirectoryName(filePath);
-            watcher.Filter = Path.GetFileName(filePath);
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
-            watcher.Changed += OnSettingsFileChanged;
-            watcher.EnableRaisingEvents = true;
+                FileSystemWatcher watcher = new FileSystemWatcher();
+                watcher.Path = Path.GetDirectoryName(filePath);
+                watcher.Filter = Path.GetFileName(filePath);
+                watcher.NotifyFilter = NotifyFilters.LastWrite;
+                watcher.Changed += OnSettingsFileChanged;
+                watcher.EnableRaisingEvents = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Info(ex.Message);
+            }
         }
 
         protected override void OnStop()
         {
-            timer.Stop();
-            timer.Dispose();
-            _logger.Info("Monitoring service is stopped.");
+            foreach (var timer in timers)
+            {
+                timer.Stop();
+                timer.Dispose();
+            }
+            _logger.Info("Monitoring servis durduruldu.");
         }
 
-        private async void CheckServices(object sender, ElapsedEventArgs e)
+        private async Task CheckIISService(string serviceName, string pingUrl)
         {
-            if (string.IsNullOrEmpty(serviceName))
+            if (!await IsHttpServiceControlling(pingUrl))
             {
-                _logger.Error("Service dosyasında service name belirtilmemiş.");
-                return;
-            }
+                _logger.Info(serviceName + " başlatılacak.");
+                try
+                {
+                    var server = new ServerManager();
+                    var site = server.Sites.FirstOrDefault(s => s.Name == serviceName);
 
-            if (serviceName == "MockWindows")
-            {
-                if (!IsServiceRunning(serviceName))
-                {
-                    _logger.Info("MockWindows Service başlatılacak.");
-                    RestartService(serviceName);
+                    if (site != null)
+                    {
+                        site.Start();
+                        _logger.Info(serviceName + " servisi yeniden başlatılıyor.");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.Info("MockWindows zaten çalışıyor.");
+                    _logger.Error($"Hata: {ex.Message}");
+                    return;
                 }
+                _logger.Info(serviceName + " servisi yeniden başlatıldı.");
             }
-            else if (serviceName == "WebApi")
+            else
             {
-                if (!await IsHttpServiceControlling("https://localhost:5011/api/Ping"))
-                //if (!await IsHttpServiceControlling("https://localhost:7071/api/Ping"))
+                _logger.Info(serviceName + " zaten çalışıyor.");
+            }
+        }
+
+        private void CheckWindowsService(string serviceName)
+        {
+            if (!IsServiceRunning(serviceName))
+            {
+                _logger.Info(serviceName + " servisi yeniden başlatılıyor.");
+
+                try
                 {
-                    _logger.Info("WebApi başlatılacak.");
-                    RestartWebApi();
+                    ServiceController sc = new ServiceController(serviceName);
+
+                    sc.Start();
+                    sc.WaitForStatus(ServiceControllerStatus.Running);
+
+                    _logger.Info(serviceName + " servisi yeniden başlatıldı.");
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.Info("WebApi zaten çalışıyor.");
+                    _logger.Error($"Hata: {ex.Message}");
                 }
             }
             else
             {
-                _logger.Error($"Unknown service name '{serviceName}' specified in the settings file.");
-            }
-
-            //if (!IsServiceRunning("MockWindows"))
-            //{
-            //    _logger.Info("MockWindows Service başlatılacak.");
-            //    RestartService("MockWindows");
-            //}
-            //else
-            //{
-            //    _logger.Info("MockWindows zaten çalışıyor.");
-            //}
-
-            //if (!await IsHttpServiceControlling("https://localhost:5011/api/Ping"))
-            //{
-            //    _logger.Info("WebApi başlatılacak.");
-            //    RestartWebApi();
-            //}
-            //else
-            //{
-            //    _logger.Info("WebApi zaten çalışıyor.");
-            //}
-        }
-
-        private void RestartService(string serviceName)
-        {
-            try
-            {
-                ServiceController sc = new ServiceController(serviceName);
-
-                sc.Start();
-                sc.WaitForStatus(ServiceControllerStatus.Running);
-
-                _logger.Info($"{serviceName} servisi yeniden başlatıldı.");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Hata: {ex.Message}");
+                _logger.Info(serviceName + " zaten çalışıyor.");
             }
         }
         private bool IsServiceRunning(string serviceName)
@@ -171,73 +157,51 @@ namespace MonitoringService
             }
         }
 
-        private void RestartWebApi()
+        private List<ServiceSettings> ReadServiceSettings(string path)
         {
-            try
-            {
-                var server = new ServerManager();
-                var site = server.Sites.FirstOrDefault(s => s.Name == "WebApi");
-
-                if (site != null)
-                {
-                    site.Start();
-                    _logger.Info($"WebApi servisi yeniden başlatılıyor.");
-
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Hata: {ex.Message}");
-                return;
-            }
-            _logger.Info($"WebApi servisi yeniden başlatıldı.");
-        }
-
-        private void StartTimerFromSettings()
-        {
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    string[] lines = File.ReadAllLines(filePath);
-                    foreach (string line in lines)
-                    {
-                        string[] parts = line.Split(',');
-
-                        if (int.TryParse(parts[1].Trim(), out int interval))
-                        {
-                            timer.Interval = interval * 60000;
-                            _logger.Info($"Timer aralığı {interval} dakikaya ayarlandı.");
-                        }
-                    }
-                }
-                else
-                {
-                    _logger.Error("Data dosyası mevcut değil.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Timer aralığını ayarlarken hata oluştu: {ex.Message}");
-            }
-        }
-
-        private string GetServiceNameFromSettings()
-        {
-            string[] lines = File.ReadAllLines(filePath);
-            foreach (string line in lines)
-            {
-                string[] parts = line.Split(',');
-                return parts[0].Trim();
-            }
-
-            return null;
+            string jsonContent = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
         }
 
         private void OnSettingsFileChanged(object source, FileSystemEventArgs e)
         {
-            StartTimerFromSettings();
-            serviceName = GetServiceNameFromSettings();
+            var serviceSettings = ReadServiceSettings(filePath);
+
+            foreach (var timer in timers)
+            {
+                timer.Stop();
+                timer.Dispose();
+            }
+            timers.Clear();
+
+            ApplySettings(serviceSettings);
+        }
+
+        private void ApplySettings(List<ServiceSettings> serviceSettings)
+        {
+            foreach (var serviceSetting in serviceSettings)
+            {
+                var timer = new Timer();
+                timer.Interval = serviceSetting.Frequency * 60000;
+
+                if (serviceSetting.ServiceType == Shared.Services.ServiceType.IIS)
+                {
+                    timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+                    {
+                        await CheckIISService(serviceSetting.ServiceName, serviceSetting.PingUrl);
+                    };
+                }
+                else
+                {
+                    timer.Elapsed += (object sender, ElapsedEventArgs e) =>
+                    {
+                        CheckWindowsService(serviceSetting.ServiceName);
+                    };
+                }
+
+                timer.Start();
+                timers.Add(timer);
+            }
         }
     }
 }
