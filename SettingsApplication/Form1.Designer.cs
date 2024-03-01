@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            txt_serviceInfo = new TextBox();
             lbl_serviceInfo = new Label();
             nupViewingFrequency = new NumericUpDown();
             lbl_viewingFrequency = new Label();
@@ -36,15 +35,9 @@
             cmb_logLevel = new ComboBox();
             btn_start = new Button();
             btn_stop = new Button();
+            cmb_serviceInfo = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)nupViewingFrequency).BeginInit();
             SuspendLayout();
-            // 
-            // txt_serviceInfo
-            // 
-            txt_serviceInfo.Location = new Point(273, 85);
-            txt_serviceInfo.Name = "txt_serviceInfo";
-            txt_serviceInfo.Size = new Size(172, 27);
-            txt_serviceInfo.TabIndex = 0;
             // 
             // lbl_serviceInfo
             // 
@@ -61,7 +54,7 @@
             nupViewingFrequency.Location = new Point(273, 134);
             nupViewingFrequency.Name = "nupViewingFrequency";
             nupViewingFrequency.Size = new Size(172, 27);
-            nupViewingFrequency.TabIndex = 2;
+            nupViewingFrequency.TabIndex = 4;
             // 
             // lbl_viewingFrequency
             // 
@@ -90,33 +83,47 @@
             cmb_logLevel.Location = new Point(271, 190);
             cmb_logLevel.Name = "cmb_logLevel";
             cmb_logLevel.Size = new Size(174, 28);
-            cmb_logLevel.TabIndex = 4;
+            cmb_logLevel.TabIndex = 6;
             // 
             // btn_start
             // 
+            btn_start.BackColor = Color.DarkRed;
             btn_start.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            btn_start.ForeColor = SystemColors.Control;
             btn_start.Location = new Point(95, 277);
             btn_start.Name = "btn_start";
             btn_start.Size = new Size(172, 40);
-            btn_start.TabIndex = 6;
+            btn_start.TabIndex = 7;
             btn_start.Text = "Start";
-            btn_start.UseVisualStyleBackColor = true;
+            btn_start.UseVisualStyleBackColor = false;
+            btn_start.Click += btn_start_Click;
             // 
             // btn_stop
             // 
+            btn_stop.Enabled = false;
             btn_stop.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             btn_stop.Location = new Point(273, 277);
             btn_stop.Name = "btn_stop";
             btn_stop.Size = new Size(172, 40);
-            btn_stop.TabIndex = 7;
+            btn_stop.TabIndex = 8;
             btn_stop.Text = "Stop";
             btn_stop.UseVisualStyleBackColor = true;
+            // 
+            // cmb_serviceInfo
+            // 
+            cmb_serviceInfo.FormattingEnabled = true;
+            cmb_serviceInfo.Items.AddRange(new object[] { "MockWindows", "WebApi" });
+            cmb_serviceInfo.Location = new Point(271, 85);
+            cmb_serviceInfo.Name = "cmb_serviceInfo";
+            cmb_serviceInfo.Size = new Size(174, 28);
+            cmb_serviceInfo.TabIndex = 2;
             // 
             // frm_settings
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(554, 413);
+            Controls.Add(cmb_serviceInfo);
             Controls.Add(btn_stop);
             Controls.Add(btn_start);
             Controls.Add(cmb_logLevel);
@@ -124,7 +131,6 @@
             Controls.Add(lbl_viewingFrequency);
             Controls.Add(nupViewingFrequency);
             Controls.Add(lbl_serviceInfo);
-            Controls.Add(txt_serviceInfo);
             Name = "frm_settings";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Settings Application";
@@ -134,8 +140,6 @@
         }
 
         #endregion
-
-        private TextBox txt_serviceInfo;
         private Label lbl_serviceInfo;
         private NumericUpDown nupViewingFrequency;
         private Label lbl_viewingFrequency;
@@ -143,5 +147,6 @@
         private ComboBox cmb_logLevel;
         private Button btn_start;
         private Button btn_stop;
+        private ComboBox cmb_serviceInfo;
     }
 }

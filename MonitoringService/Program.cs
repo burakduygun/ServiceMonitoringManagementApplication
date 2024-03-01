@@ -17,6 +17,7 @@ namespace MonitoringService
             string fileLoggingPath = ConfigurationManager.AppSettings["FileLoggingPath"];
             string fileLoggingServiceName = ConfigurationManager.AppSettings["FileLoggingServiceName"];
             string fileLoggingLogLevel = ConfigurationManager.AppSettings["FileLoggingLogLevel"];
+            //string WebApiPath = ConfigurationManager.AppSettings["FileLoggingLogLevel"];
 
             var logger = new FileLogger(fileLoggingPath, fileLoggingServiceName);
 
