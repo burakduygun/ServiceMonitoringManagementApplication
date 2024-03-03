@@ -9,6 +9,14 @@ namespace SettingsApplication
 {
     public partial class frm_settings : Form
     {
+        public TextBox TxtUrl => txt_url;
+        public Label LblUrl => lbl_url;
+
+        public ComboBox CmbServiceInfo => cmb_serviceInfo;
+        public NumericUpDown NupViewingFrequency => nupViewingFrequency;
+        public ComboBox CmbLogLevel => cmb_logLevel;
+        public Button BtnSave => btn_save;
+
         private readonly List<ServiceSettings> _serviceSettings;
         public frm_settings()
         {
@@ -29,7 +37,7 @@ namespace SettingsApplication
             btn_save.Enabled = false;
         }
 
-        private void btn_save_Click(object sender, EventArgs e)
+        public void btn_save_Click(object sender, EventArgs e)
         {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string settingsPath = Path.Combine(desktopPath, "settings");
@@ -62,7 +70,7 @@ namespace SettingsApplication
             btn_save.Enabled = false;
         }
 
-        private void CheckFormCompletion()
+        public void CheckFormCompletion()
         {
             if (!string.IsNullOrWhiteSpace(cmb_logLevel.Text) &&
                 !string.IsNullOrWhiteSpace(cmb_serviceInfo.Text) &&
@@ -75,8 +83,7 @@ namespace SettingsApplication
                 btn_save.Enabled = false;
             }
         }
-
-        private void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
+        public void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedServiceSetting = _serviceSettings.FirstOrDefault(s => s.ServiceName == cmb_serviceInfo.Text);
             if (selectedServiceSetting != null)
@@ -102,11 +109,11 @@ namespace SettingsApplication
             CheckFormCompletion();
         }
 
-        private void cmb_logLevel_SelectedIndexChanged(object sender, EventArgs e)
+        public void cmb_logLevel_SelectedIndexChanged(object sender, EventArgs e)
         {
             CheckFormCompletion();
         }
-        private void nupViewingFrequency_ValueChanged(object sender, EventArgs e)
+        public void nupViewingFrequency_ValueChanged(object sender, EventArgs e)
         {
             CheckFormCompletion();
         }
