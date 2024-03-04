@@ -7,24 +7,6 @@ namespace ServiceMonitoringManagementApplication.Test
 {
     public class SettingsApplicationTest
     {
-        //[Fact]
-        //public void SaveButton_Click_WritesToJsonFile()
-        //{
-        //    // Arrange
-        //    var form = new frm_settings();
-        //    var initialJsonContent = File.ReadAllText("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");
-        //    var initialServiceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(initialJsonContent);
-
-        //    // Act
-        //    form.BtnSave.PerformClick();
-
-        //    // Assert
-        //    var updatedJsonContent = File.ReadAllText("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");
-        //    var updatedServiceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(updatedJsonContent);
-
-        //    Assert.NotNull(updatedServiceSettings);
-        //    Assert.NotEqual(initialServiceSettings, updatedServiceSettings);
-        //}
 
         [Fact]
         public void CheckFormCompletion_WithCompleteForm_EnablesSaveButton()

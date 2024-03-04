@@ -14,7 +14,7 @@ namespace SettingsApplication
 
         public ComboBox CmbServiceInfo => cmb_serviceInfo;
         public NumericUpDown NupViewingFrequency => nupViewingFrequency;
-        public ComboBox CmbLogLevel => cmb_logLevel;
+        //public ComboBox CmbLogLevel => cmb_logLevel;
         public Button BtnSave => btn_save;
 
         private readonly List<ServiceSettings> _serviceSettings;
@@ -29,10 +29,6 @@ namespace SettingsApplication
             {
                 cmb_serviceInfo.Items.Add(servicesetting.ServiceName);
             }
-            foreach (var level in Enum.GetValues(typeof(LogLevel)))
-            {
-                cmb_logLevel.Items.Add(level);
-            }
 
             btn_save.Enabled = false;
         }
@@ -41,18 +37,16 @@ namespace SettingsApplication
         {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string settingsPath = Path.Combine(desktopPath, "settings");
-            string filePath = "servicesettings.json";
 
             if (!Directory.Exists(settingsPath))
             {
                 Directory.CreateDirectory(settingsPath);
             }
 
-            var selectedServiceSetting = _serviceSettings.FirstOrDefault(s => s.ServiceName == cmb_serviceInfo.Text);
+            var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
 
             if (selectedServiceSetting != null)
             {
-                selectedServiceSetting.LogLevel = Enum.Parse<LogLevel>(cmb_logLevel.Text);
                 selectedServiceSetting.Frequency = (int)nupViewingFrequency.Value;
                 if (selectedServiceSetting.ServiceType == ServiceType.IIS)
                     selectedServiceSetting.PingUrl = txt_url.Text;
@@ -64,7 +58,7 @@ namespace SettingsApplication
             MessageBox.Show("Veriler dosyaya yazıldı.");
 
             cmb_serviceInfo.Text = "";
-            cmb_logLevel.Text = "";
+            txt_logLevel.Text = "";
             nupViewingFrequency.Value = 0;
             txt_url.Text = "";
             btn_save.Enabled = false;
@@ -72,7 +66,7 @@ namespace SettingsApplication
 
         public void CheckFormCompletion()
         {
-            if (!string.IsNullOrWhiteSpace(cmb_logLevel.Text) &&
+            if (!string.IsNullOrWhiteSpace(txt_logLevel.Text) &&
                 !string.IsNullOrWhiteSpace(cmb_serviceInfo.Text) &&
                 nupViewingFrequency.Value > 0)
             {
@@ -85,7 +79,7 @@ namespace SettingsApplication
         }
         public void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selectedServiceSetting = _serviceSettings.FirstOrDefault(s => s.ServiceName == cmb_serviceInfo.Text);
+            var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
             if (selectedServiceSetting != null)
             {
                 if (selectedServiceSetting.ServiceType == ServiceType.IIS)
@@ -104,15 +98,11 @@ namespace SettingsApplication
 
                 nupViewingFrequency.Value = selectedServiceSetting.Frequency;
 
-                cmb_logLevel.SelectedItem = selectedServiceSetting.LogLevel;
+                txt_logLevel.Text = selectedServiceSetting.LogLevel.ToString();
             }
             CheckFormCompletion();
         }
 
-        public void cmb_logLevel_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            CheckFormCompletion();
-        }
         public void nupViewingFrequency_ValueChanged(object sender, EventArgs e)
         {
             CheckFormCompletion();

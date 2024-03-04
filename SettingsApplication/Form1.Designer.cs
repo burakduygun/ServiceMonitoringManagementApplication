@@ -32,11 +32,11 @@
             nupViewingFrequency = new NumericUpDown();
             lbl_viewingFrequency = new Label();
             lbl_logLevel = new Label();
-            cmb_logLevel = new ComboBox();
             btn_save = new Button();
             cmb_serviceInfo = new ComboBox();
             txt_url = new TextBox();
             lbl_url = new Label();
+            txt_logLevel = new TextBox();
             ((System.ComponentModel.ISupportInitialize)nupViewingFrequency).BeginInit();
             SuspendLayout();
             // 
@@ -78,21 +78,12 @@
             lbl_logLevel.TabIndex = 5;
             lbl_logLevel.Text = "Log Level:";
             // 
-            // cmb_logLevel
-            // 
-            cmb_logLevel.FormattingEnabled = true;
-            cmb_logLevel.Location = new Point(235, 158);
-            cmb_logLevel.Name = "cmb_logLevel";
-            cmb_logLevel.Size = new Size(235, 28);
-            cmb_logLevel.TabIndex = 6;
-            cmb_logLevel.SelectedIndexChanged += cmb_logLevel_SelectedIndexChanged;
-            // 
             // btn_save
             // 
             btn_save.BackColor = Color.DarkRed;
             btn_save.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             btn_save.ForeColor = SystemColors.Control;
-            btn_save.Location = new Point(59, 245);
+            btn_save.Location = new Point(59, 254);
             btn_save.Name = "btn_save";
             btn_save.Size = new Size(411, 40);
             btn_save.TabIndex = 7;
@@ -121,22 +112,30 @@
             // 
             lbl_url.AutoSize = true;
             lbl_url.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl_url.Location = new Point(63, 203);
+            lbl_url.Location = new Point(63, 210);
             lbl_url.Name = "lbl_url";
             lbl_url.Size = new Size(69, 20);
             lbl_url.TabIndex = 5;
             lbl_url.Text = "Ping Url:";
             lbl_url.Visible = false;
             // 
+            // txt_logLevel
+            // 
+            txt_logLevel.Enabled = false;
+            txt_logLevel.Location = new Point(235, 158);
+            txt_logLevel.Name = "txt_logLevel";
+            txt_logLevel.Size = new Size(235, 27);
+            txt_logLevel.TabIndex = 9;
+            // 
             // frm_settings
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(504, 337);
+            Controls.Add(txt_logLevel);
             Controls.Add(txt_url);
             Controls.Add(cmb_serviceInfo);
             Controls.Add(btn_save);
-            Controls.Add(cmb_logLevel);
             Controls.Add(lbl_url);
             Controls.Add(lbl_logLevel);
             Controls.Add(lbl_viewingFrequency);
@@ -155,10 +154,10 @@
         private NumericUpDown nupViewingFrequency;
         private Label lbl_viewingFrequency;
         private Label lbl_logLevel;
-        private ComboBox cmb_logLevel;
         private Button btn_save;
         private ComboBox cmb_serviceInfo;
         private TextBox txt_url;
         private Label lbl_url;
+        private TextBox txt_logLevel;
     }
 }
