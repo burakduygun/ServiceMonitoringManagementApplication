@@ -11,6 +11,8 @@ using System.IO;
 using System.Collections.Generic;
 using Shared.Services;
 using System.Text.Json;
+using System.Configuration;
+using MonitoringService.ManageService;
 
 namespace MonitoringService
 {
@@ -18,8 +20,7 @@ namespace MonitoringService
     {
         private List<Timer> timers = new List<Timer>();
         private readonly AbstractLogger _logger;
-        private string filePath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
-
+        private string filePath = ConfigurationManager.AppSettings["ServiceSettingsPath"];
         public Service1(AbstractLogger logger)
         {
             _logger = logger;
@@ -59,104 +60,6 @@ namespace MonitoringService
             _logger.Info("Monitoring servis durduruldu.");
         }
 
-        private async Task CheckIISService(string serviceName, string pingUrl)
-        {
-            if (!await IsHttpServiceControlling(pingUrl))
-            {
-                _logger.Info(serviceName + " başlatılacak.");
-                try
-                {
-                    var server = new ServerManager();
-                    var site = server.Sites.FirstOrDefault(s => s.Name == serviceName);
-
-                    if (site != null)
-                    {
-                        site.Start();
-                        _logger.Info(serviceName + " servisi yeniden başlatılıyor.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error($"Hata: {ex.Message}");
-                    return;
-                }
-                _logger.Info(serviceName + " servisi yeniden başlatıldı.");
-            }
-            else
-            {
-                _logger.Info(serviceName + " zaten çalışıyor.");
-            }
-        }
-
-        private void CheckWindowsService(string serviceName)
-        {
-            if (!IsServiceRunning(serviceName))
-            {
-                _logger.Info(serviceName + " servisi yeniden başlatılıyor.");
-
-                try
-                {
-                    ServiceController sc = new ServiceController(serviceName);
-
-                    sc.Start();
-                    sc.WaitForStatus(ServiceControllerStatus.Running);
-
-                    _logger.Info(serviceName + " servisi yeniden başlatıldı.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error($"Hata: {ex.Message}");
-                }
-            }
-            else
-            {
-                _logger.Info(serviceName + " zaten çalışıyor.");
-            }
-        }
-        private bool IsServiceRunning(string serviceName)
-        {
-            try
-            {
-                ServiceController sc = new ServiceController(serviceName);
-                return sc.Status == ServiceControllerStatus.Running;
-
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Hata: {ex.Message}");
-            }
-            return false;
-        }
-
-        private async Task<bool> IsHttpServiceControlling(string url)
-        {
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    // Sertifika doğrulamasını devre dışı bırak
-                    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-
-                    var response = await httpClient.GetAsync(url);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        _logger.Info($"{url} servisi erişilebilir durumda. {response.StatusCode}");
-                        return true;
-                    }
-                    else
-                    {
-                        _logger.Info($"{url} servisine erişilemedi. Durum kodu: {response.StatusCode}");
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Hata: {ex.InnerException.Message}");
-                return false;
-            }
-        }
-
         private List<ServiceSettings> ReadServiceSettings(string path)
         {
             string jsonContent = File.ReadAllText(path);
@@ -181,23 +84,23 @@ namespace MonitoringService
         {
             foreach (var serviceSetting in serviceSettings)
             {
+                IService service;
                 var timer = new Timer();
                 timer.Interval = serviceSetting.Frequency * 60000;
 
                 if (serviceSetting.ServiceType == Shared.Services.ServiceType.IIS)
                 {
-                    timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
-                    {
-                        await CheckIISService(serviceSetting.ServiceName, serviceSetting.PingUrl);
-                    };
+                    service = new IisService(serviceSetting.ServiceName, serviceSetting.PingUrl, _logger);
                 }
                 else
                 {
-                    timer.Elapsed += (object sender, ElapsedEventArgs e) =>
-                    {
-                        CheckWindowsService(serviceSetting.ServiceName);
-                    };
+                    service = new MockWindowsService(serviceSetting.ServiceName, _logger);
                 }
+
+                timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+                {
+                    await service.CheckStatus();
+                };
 
                 timer.Start();
                 timers.Add(timer);

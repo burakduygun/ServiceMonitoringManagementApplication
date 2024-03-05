@@ -1,5 +1,6 @@
 ﻿using Shared.Logging;
 using Shared.Services;
+using System.Configuration;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,11 +19,13 @@ namespace SettingsApplication
         public Button BtnSave => btn_save;
 
         private readonly List<ServiceSettings> _serviceSettings;
+        string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
+
         public frm_settings()
         {
             InitializeComponent();
 
-            string jsonContent = File.ReadAllText("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");
+            string jsonContent = File.ReadAllText(serviceSettingsPath);
             _serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
 
             foreach (var servicesetting in _serviceSettings)
@@ -53,7 +56,7 @@ namespace SettingsApplication
             }
 
             string jsonString = JsonSerializer.Serialize(_serviceSettings);
-            File.WriteAllText("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json", jsonString);
+            File.WriteAllText(serviceSettingsPath, jsonString);
 
             MessageBox.Show("Veriler dosyaya yazıldı.");
 

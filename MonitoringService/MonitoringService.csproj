@@ -224,6 +224,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ManageService\IisService.cs" />
+    <Compile Include="ManageService\IService.cs" />
+    <Compile Include="ManageService\MockWindowsService.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
