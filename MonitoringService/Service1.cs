@@ -31,7 +31,7 @@ namespace MonitoringService
         {
             try
             {
-                var serviceSettings = ReadServiceSettings(filePath);
+                var serviceSettings = Shared.Services.FileAccess.LoadServiceSettings(filePath);
 
                 ApplySettings(serviceSettings);
 
@@ -60,50 +60,70 @@ namespace MonitoringService
             _logger.Info("Monitoring servis durduruldu.");
         }
 
-        private List<ServiceSettings> ReadServiceSettings(string path)
-        {
-            string jsonContent = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
-        }
+        //private List<ServiceSettings> ReadServiceSettings(string path)
+        //{
+        //    //string jsonContent = File.ReadAllText(path);
+        //    //return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
+
+        //    using (StreamReader reader = new StreamReader(path))
+        //    {
+        //        string jsonContent = reader.ReadToEnd();
+        //        return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
+        //    }
+        //}
 
         private void OnSettingsFileChanged(object source, FileSystemEventArgs e)
         {
-            var serviceSettings = ReadServiceSettings(filePath);
-
-            foreach (var timer in timers)
+            try
             {
-                timer.Stop();
-                timer.Dispose();
-            }
-            timers.Clear();
+                var serviceSettings = Shared.Services.FileAccess.LoadServiceSettings(filePath);
 
-            ApplySettings(serviceSettings);
+                foreach (var timer in timers)
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                }
+                timers.Clear();
+
+                ApplySettings(serviceSettings);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message);
+            }
         }
 
         private void ApplySettings(List<ServiceSettings> serviceSettings)
         {
-            foreach (var serviceSetting in serviceSettings)
+            try
             {
-                IService service;
-                var timer = new Timer();
-                timer.Interval = serviceSetting.Frequency * 60000;
-
-                if (serviceSetting.ServiceType == Shared.Services.ServiceType.IIS)
+                foreach (var serviceSetting in serviceSettings)
                 {
-                    service = new IisService(serviceSetting.ServiceName, serviceSetting.PingUrl, _logger);
+                    IService service;
+                    var timer = new Timer();
+                    timer.Interval = serviceSetting.Frequency * 60000;
+
+                    if (serviceSetting.ServiceType == Shared.Services.ServiceType.IIS)
+                    {
+                        service = new IisService(serviceSetting.ServiceName, serviceSetting.PingUrl, _logger);
+                    }
+                    else
+                    {
+                        service = new MockWindowsService(serviceSetting.ServiceName, _logger);
+                    }
+
+                    timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+                    {
+                        await service.CheckStatus();
+                    };
+
+                    timer.Start();
+                    timers.Add(timer);
                 }
-                else
-                {
-                    service = new MockWindowsService(serviceSetting.ServiceName, _logger);
-                }
-
-                timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
-                {
-                    await service.CheckStatus();
-                };
-
-                timer.Start();
-                timers.Add(timer);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message);
             }
         }
     }

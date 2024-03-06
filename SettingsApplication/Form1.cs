@@ -1,4 +1,5 @@
-﻿using Shared.Logging;
+﻿using SettingsApplication.Settings;
+using Shared.Logging;
 using Shared.Services;
 using System.Configuration;
 using System.IO;
@@ -10,30 +11,48 @@ namespace SettingsApplication
 {
     public partial class frm_settings : Form
     {
-        public TextBox TxtUrl => txt_url;
-        public Label LblUrl => lbl_url;
+        //private readonly List<ServiceSettings> _serviceSettings;
+        //string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
 
-        public ComboBox CmbServiceInfo => cmb_serviceInfo;
-        public NumericUpDown NupViewingFrequency => nupViewingFrequency;
-        //public ComboBox CmbLogLevel => cmb_logLevel;
-        public Button BtnSave => btn_save;
+        //public frm_settings()
+        //{
+        //    InitializeComponent();
 
-        private readonly List<ServiceSettings> _serviceSettings;
+        //    string jsonContent = File.ReadAllText(serviceSettingsPath);
+        //    _serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
+
+        //    foreach (var servicesetting in _serviceSettings)
+        //    {
+        //        cmb_serviceInfo.Items.Add(servicesetting.ServiceName);
+        //    }
+
+        //    btn_save.Enabled = false;
+        //}
+
+        private readonly SettingsManager _settingsManager;
         string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
 
         public frm_settings()
         {
             InitializeComponent();
 
-            string jsonContent = File.ReadAllText(serviceSettingsPath);
-            _serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
+            _settingsManager = new SettingsManager(serviceSettingsPath);
 
-            foreach (var servicesetting in _serviceSettings)
+            //string jsonContent = File.ReadAllText(serviceSettingsPath);
+            //_serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
+
+            PopulateServiceInfoComboBox();
+            btn_save.Enabled = false;
+        }
+
+        private void PopulateServiceInfoComboBox()
+        {
+            var serviceSettings = Shared.Services.FileAccess.LoadServiceSettings(serviceSettingsPath);
+
+            foreach (var servicesetting in serviceSettings)
             {
                 cmb_serviceInfo.Items.Add(servicesetting.ServiceName);
             }
-
-            btn_save.Enabled = false;
         }
 
         public void btn_save_Click(object sender, EventArgs e)
@@ -46,7 +65,7 @@ namespace SettingsApplication
                 Directory.CreateDirectory(settingsPath);
             }
 
-            var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
+            var selectedServiceSetting = _settingsManager.GetServiceSettingByName(cmb_serviceInfo.Text);
 
             if (selectedServiceSetting != null)
             {
@@ -55,34 +74,56 @@ namespace SettingsApplication
                     selectedServiceSetting.PingUrl = txt_url.Text;
             }
 
-            string jsonString = JsonSerializer.Serialize(_serviceSettings);
-            File.WriteAllText(serviceSettingsPath, jsonString);
+            _settingsManager.UpdateServiceSetting(selectedServiceSetting!);
 
             MessageBox.Show("Veriler dosyaya yazıldı.");
 
-            cmb_serviceInfo.Text = "";
-            txt_logLevel.Text = "";
-            nupViewingFrequency.Value = 0;
-            txt_url.Text = "";
+            ClearFormFields();
             btn_save.Enabled = false;
         }
 
-        public void CheckFormCompletion()
+        //public void btn_save_Click(object sender, EventArgs e)
+        //{
+        //    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        //    string settingsPath = Path.Combine(desktopPath, "settings");
+
+        //    if (!Directory.Exists(settingsPath))
+        //    {
+        //        Directory.CreateDirectory(settingsPath);
+        //    }
+
+        //    var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
+
+        //    if (selectedServiceSetting != null)
+        //    {
+        //        selectedServiceSetting.Frequency = (int)nupViewingFrequency.Value;
+        //        if (selectedServiceSetting.ServiceType == ServiceType.IIS)
+        //            selectedServiceSetting.PingUrl = txt_url.Text;
+        //    }
+
+        //    string jsonString = JsonSerializer.Serialize(_serviceSettings);
+        //    File.WriteAllText(serviceSettingsPath, jsonString);
+
+        //    MessageBox.Show("Veriler dosyaya yazıldı.");
+
+        //    cmb_serviceInfo.Text = "";
+        //    txt_logLevel.Text = "";
+        //    nupViewingFrequency.Value = 0;
+        //    txt_url.Text = "";
+        //    btn_save.Enabled = false;
+        //}
+
+        private void ClearFormFields()
         {
-            if (!string.IsNullOrWhiteSpace(txt_logLevel.Text) &&
-                !string.IsNullOrWhiteSpace(cmb_serviceInfo.Text) &&
-                nupViewingFrequency.Value > 0)
-            {
-                btn_save.Enabled = true;
-            }
-            else
-            {
-                btn_save.Enabled = false;
-            }
+            cmb_serviceInfo.Text = "";
+            nupViewingFrequency.Value = 0;
+            txt_url.Text = "";
         }
+
         public void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
+            var selectedServiceSetting = _settingsManager.GetServiceSettingByName(cmb_serviceInfo.Text);
+
             if (selectedServiceSetting != null)
             {
                 if (selectedServiceSetting.ServiceType == ServiceType.IIS)
@@ -106,9 +147,49 @@ namespace SettingsApplication
             CheckFormCompletion();
         }
 
+        //public void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
+        //    if (selectedServiceSetting != null)
+        //    {
+        //        if (selectedServiceSetting.ServiceType == ServiceType.IIS)
+        //        {
+        //            txt_url.Visible = true;
+        //            lbl_url.Visible = true;
+
+        //            txt_url.Text = selectedServiceSetting.PingUrl;
+        //        }
+        //        else
+        //        {
+        //            txt_url.Visible = false;
+        //            lbl_url.Visible = false;
+        //            txt_url.Text = "";
+        //        }
+
+        //        nupViewingFrequency.Value = selectedServiceSetting.Frequency;
+
+        //        txt_logLevel.Text = selectedServiceSetting.LogLevel.ToString();
+        //    }
+        //    CheckFormCompletion();
+        //}
+
         public void nupViewingFrequency_ValueChanged(object sender, EventArgs e)
         {
             CheckFormCompletion();
+        }
+
+        public void CheckFormCompletion()
+        {
+            if (!string.IsNullOrWhiteSpace(txt_logLevel.Text) &&
+                !string.IsNullOrWhiteSpace(cmb_serviceInfo.Text) &&
+                nupViewingFrequency.Value > 0)
+            {
+                btn_save.Enabled = true;
+            }
+            else
+            {
+                btn_save.Enabled = false;
+            }
         }
     }
 }
