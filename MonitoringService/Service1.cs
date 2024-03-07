@@ -13,15 +13,18 @@ using Shared.Services;
 using System.Text.Json;
 using System.Configuration;
 using MonitoringService.ManageService;
+using Serilog;
 
 namespace MonitoringService
 {
     public partial class Service1 : ServiceBase
     {
         private List<Timer> timers = new List<Timer>();
-        private readonly AbstractLogger _logger;
+        //private readonly AbstractLogger _logger;
+        private readonly ILogger _logger;
+
         private string filePath = ConfigurationManager.AppSettings["ServiceSettingsPath"];
-        public Service1(AbstractLogger logger)
+        public Service1(ILogger logger)
         {
             _logger = logger;
             InitializeComponent();
@@ -35,7 +38,8 @@ namespace MonitoringService
 
                 ApplySettings(serviceSettings);
 
-                _logger.Info("Monitoring servis başlatılıyor.");
+                //_logger.Info("Monitoring servis başlatılıyor.");
+                _logger.Information("Monitoring servis başlatılıyor.");
 
                 FileSystemWatcher watcher = new FileSystemWatcher();
                 watcher.Path = Path.GetDirectoryName(filePath);
@@ -46,7 +50,8 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
-                _logger.Info(ex.Message);
+                //_logger.Error(ex.Message);
+                _logger.Error(ex.Message);
             }
         }
 
@@ -57,20 +62,9 @@ namespace MonitoringService
                 timer.Stop();
                 timer.Dispose();
             }
-            _logger.Info("Monitoring servis durduruldu.");
+            //_logger.Info("Monitoring servis durduruldu.");
+            _logger.Information("Monitoring servis durduruldu.");
         }
-
-        //private List<ServiceSettings> ReadServiceSettings(string path)
-        //{
-        //    //string jsonContent = File.ReadAllText(path);
-        //    //return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
-
-        //    using (StreamReader reader = new StreamReader(path))
-        //    {
-        //        string jsonContent = reader.ReadToEnd();
-        //        return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
-        //    }
-        //}
 
         private void OnSettingsFileChanged(object source, FileSystemEventArgs e)
         {
@@ -89,6 +83,7 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
+                //_logger.Error(ex.Message);
                 _logger.Error(ex.Message);
             }
         }
@@ -123,6 +118,7 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
+                //_logger.Error(ex.Message);
                 _logger.Error(ex.Message);
             }
         }

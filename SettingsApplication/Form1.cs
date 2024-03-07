@@ -29,9 +29,9 @@ namespace SettingsApplication
         //    btn_save.Enabled = false;
         //}
 
-        private readonly SettingsManager _settingsManager;
+        public readonly SettingsManager _settingsManager;
         string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
-
+        //string serviceSettingsPath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
         public frm_settings()
         {
             InitializeComponent();

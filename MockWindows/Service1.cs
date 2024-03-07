@@ -1,4 +1,5 @@
-﻿using Shared.Logging;
+﻿using Serilog;
+using Shared.Logging;
 using System.IO;
 using System.ServiceProcess;
 using System.Timers;
@@ -7,9 +8,10 @@ namespace MockWindows
 {
     public partial class Service1 : ServiceBase
     {
-        private readonly AbstractLogger _logger;
+        //private readonly AbstractLogger _logger;
+        private readonly ILogger _logger;
         private readonly string _watchingPath;
-        public Service1(AbstractLogger logger, string watchingPath)
+        public Service1(ILogger logger, string watchingPath)
         {
             _logger = logger;
             _watchingPath = watchingPath;
@@ -18,8 +20,8 @@ namespace MockWindows
 
         protected override void OnStart(string[] args)
         {
-            _logger.Info("Servis başlatıldı.");
-
+            //_logger.Info("Servis başlatıldı.");
+            _logger.Information("Servis başlatıldı.");
             FileSystemWatcher Watcher = new FileSystemWatcher();
             Watcher.Path = _watchingPath;
             Watcher.IncludeSubdirectories = true;
@@ -30,17 +32,20 @@ namespace MockWindows
 
         protected override void OnStop()
         {
-            _logger.Info("Servis durduruldu.");
+            //_logger.Info("Servis durduruldu.");
+            _logger.Information("Servis durduruldu.");
         }
 
         private void OnElapsedTime(object source, ElapsedEventArgs e)
         {
-            _logger.Info("Servis geri çağırılıyor.");
+            //_logger.Info("Servis geri çağırılıyor.");
+            _logger.Information("Servis geri çağırılıyor.");
         }
 
         void Wathcer_Changed(object sender, FileSystemEventArgs e)
         {
-            _logger.Info($"Change Type = {e.ChangeType}, Path = {e.FullPath}");
+            //_logger.Info($"Change Type = {e.ChangeType}, Path = {e.FullPath}");
+            _logger.Information($"Change Type = {e.ChangeType}, Path = {e.FullPath}");
         }
     }
 }

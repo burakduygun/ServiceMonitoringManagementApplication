@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MonitoringService.ManageService
 {
@@ -12,9 +13,10 @@ namespace MonitoringService.ManageService
     {
         private readonly string _serviceName;
         private readonly string _pingUrl;
-        private readonly AbstractLogger _logger;
+        //private readonly AbstractLogger _logger;
+        private readonly ILogger _logger;
 
-        public IisService(string serviceName, string pingUrl, AbstractLogger logger)
+        public IisService(string serviceName, string pingUrl, ILogger logger)
         {
             _serviceName = serviceName;
             _pingUrl = pingUrl;
@@ -37,17 +39,20 @@ namespace MonitoringService.ManageService
 
                     if (response.IsSuccessStatusCode)
                     {
-                        _logger.Info($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
+                        //_logger.Info($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
+                        _logger.Information($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
                     }
                 }
             }
             catch (Exception ex)
             {
+                //_logger.Error($"Hata: {ex.InnerException.Message}");
                 _logger.Error($"Hata: {ex.InnerException.Message}");
 
                 RestartService();
 
-                _logger.Info($"{_serviceName} başlatıldı.");
+                //_logger.Info($"{_serviceName} başlatıldı.");
+                _logger.Information($"{_serviceName} başlatıldı.");
             }
         }
 
@@ -61,11 +66,13 @@ namespace MonitoringService.ManageService
                 if (site != null)
                 {
                     site.Start();
-                    _logger.Info($"{_serviceName} servisi yeniden başlatılıyor.");
+                    //_logger.Info($"{_serviceName} servisi yeniden başlatılıyor.");
+                    _logger.Information($"{_serviceName} servisi yeniden başlatılıyor.");
                 }
             }
             catch (Exception ex)
             {
+                //_logger.Error($"Hata: {ex.Message}");
                 _logger.Error($"Hata: {ex.Message}");
             }
         }

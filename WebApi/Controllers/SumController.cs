@@ -7,16 +7,24 @@ namespace WebApi.Controllers
     [ApiController]
     public class SumController : ControllerBase
     {
-        private readonly AbstractLogger _logger;
-        public SumController(AbstractLogger logger)
+        //private readonly AbstractLogger _logger;
+        //public SumController(AbstractLogger logger)
+        //{
+        //    _logger = logger;
+        //}
+
+        private readonly ILogger<SumController> _logger;
+
+        public SumController(ILogger<SumController> logger)
         {
             _logger = logger;
         }
+
         [HttpGet]
         public int Sum(int x, int y)
         {
-            _logger.Info("Sum get isteği geldi.");
-
+            //_logger.Info("Sum get isteği geldi.");
+            _logger.LogInformation("Sum get isteği geldi.");
             return x + y;
         }
 
