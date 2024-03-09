@@ -8,6 +8,9 @@ namespace MonitoringService.ManageService
 {
     public interface IService
     {
-        Task CheckStatus();
+        string ServiceName { get; }
+
+        bool CheckStatus();
+        void RestartService();
     }
 }

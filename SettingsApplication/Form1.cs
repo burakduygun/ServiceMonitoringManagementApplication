@@ -11,35 +11,14 @@ namespace SettingsApplication
 {
     public partial class frm_settings : Form
     {
-        //private readonly List<ServiceSettings> _serviceSettings;
-        //string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
-
-        //public frm_settings()
-        //{
-        //    InitializeComponent();
-
-        //    string jsonContent = File.ReadAllText(serviceSettingsPath);
-        //    _serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
-
-        //    foreach (var servicesetting in _serviceSettings)
-        //    {
-        //        cmb_serviceInfo.Items.Add(servicesetting.ServiceName);
-        //    }
-
-        //    btn_save.Enabled = false;
-        //}
-
         public readonly SettingsManager _settingsManager;
-        string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
-        //string serviceSettingsPath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
+        //string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
+        string serviceSettingsPath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
         public frm_settings()
         {
             InitializeComponent();
 
             _settingsManager = new SettingsManager(serviceSettingsPath);
-
-            //string jsonContent = File.ReadAllText(serviceSettingsPath);
-            //_serviceSettings = JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent)!;
 
             PopulateServiceInfoComboBox();
             btn_save.Enabled = false;
@@ -82,37 +61,6 @@ namespace SettingsApplication
             btn_save.Enabled = false;
         }
 
-        //public void btn_save_Click(object sender, EventArgs e)
-        //{
-        //    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        //    string settingsPath = Path.Combine(desktopPath, "settings");
-
-        //    if (!Directory.Exists(settingsPath))
-        //    {
-        //        Directory.CreateDirectory(settingsPath);
-        //    }
-
-        //    var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
-
-        //    if (selectedServiceSetting != null)
-        //    {
-        //        selectedServiceSetting.Frequency = (int)nupViewingFrequency.Value;
-        //        if (selectedServiceSetting.ServiceType == ServiceType.IIS)
-        //            selectedServiceSetting.PingUrl = txt_url.Text;
-        //    }
-
-        //    string jsonString = JsonSerializer.Serialize(_serviceSettings);
-        //    File.WriteAllText(serviceSettingsPath, jsonString);
-
-        //    MessageBox.Show("Veriler dosyaya yazıldı.");
-
-        //    cmb_serviceInfo.Text = "";
-        //    txt_logLevel.Text = "";
-        //    nupViewingFrequency.Value = 0;
-        //    txt_url.Text = "";
-        //    btn_save.Enabled = false;
-        //}
-
         private void ClearFormFields()
         {
             cmb_serviceInfo.Text = "";
@@ -146,32 +94,6 @@ namespace SettingsApplication
             }
             CheckFormCompletion();
         }
-
-        //public void cmb_serviceInfo_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    var selectedServiceSetting = _serviceSettings.Find(s => s.ServiceName == cmb_serviceInfo.Text);
-        //    if (selectedServiceSetting != null)
-        //    {
-        //        if (selectedServiceSetting.ServiceType == ServiceType.IIS)
-        //        {
-        //            txt_url.Visible = true;
-        //            lbl_url.Visible = true;
-
-        //            txt_url.Text = selectedServiceSetting.PingUrl;
-        //        }
-        //        else
-        //        {
-        //            txt_url.Visible = false;
-        //            lbl_url.Visible = false;
-        //            txt_url.Text = "";
-        //        }
-
-        //        nupViewingFrequency.Value = selectedServiceSetting.Frequency;
-
-        //        txt_logLevel.Text = selectedServiceSetting.LogLevel.ToString();
-        //    }
-        //    CheckFormCompletion();
-        //}
 
         public void nupViewingFrequency_ValueChanged(object sender, EventArgs e)
         {

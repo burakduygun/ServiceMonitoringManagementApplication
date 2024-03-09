@@ -19,8 +19,7 @@ namespace MonitoringService
 {
     public partial class Service1 : ServiceBase
     {
-        private List<Timer> timers = new List<Timer>();
-        //private readonly AbstractLogger _logger;
+        public List<Timer> timers = new List<Timer>();
         private readonly ILogger _logger;
 
         private string filePath = ConfigurationManager.AppSettings["ServiceSettingsPath"];
@@ -38,7 +37,6 @@ namespace MonitoringService
 
                 ApplySettings(serviceSettings);
 
-                //_logger.Info("Monitoring servis başlatılıyor.");
                 _logger.Information("Monitoring servis başlatılıyor.");
 
                 FileSystemWatcher watcher = new FileSystemWatcher();
@@ -50,7 +48,6 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
-                //_logger.Error(ex.Message);
                 _logger.Error(ex.Message);
             }
         }
@@ -62,7 +59,6 @@ namespace MonitoringService
                 timer.Stop();
                 timer.Dispose();
             }
-            //_logger.Info("Monitoring servis durduruldu.");
             _logger.Information("Monitoring servis durduruldu.");
         }
 
@@ -83,12 +79,11 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
-                //_logger.Error(ex.Message);
                 _logger.Error(ex.Message);
             }
         }
 
-        private void ApplySettings(List<ServiceSettings> serviceSettings)
+        public void ApplySettings(List<ServiceSettings> serviceSettings)
         {
             try
             {
@@ -107,9 +102,9 @@ namespace MonitoringService
                         service = new MockWindowsService(serviceSetting.ServiceName, _logger);
                     }
 
-                    timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+                    timer.Elapsed += (object sender, ElapsedEventArgs e) =>
                     {
-                        await service.CheckStatus();
+                        CheckService(service, 3);
                     };
 
                     timer.Start();
@@ -118,9 +113,35 @@ namespace MonitoringService
             }
             catch (Exception ex)
             {
-                //_logger.Error(ex.Message);
                 _logger.Error(ex.Message);
             }
+        }
+
+        private void CheckService(IService service, int tryCount)
+        {
+            try
+            {
+                if (!service.CheckStatus())
+                {
+                    _logger.Information(service.ServiceName + " servisi yeniden başlatılıyor.");
+                    service.RestartService();
+                    if (tryCount > 0)
+                    {
+                        tryCount--;
+                        System.Threading.Thread.Sleep(100);
+                        CheckService(service, tryCount);
+                    }
+                }
+                else
+                {
+                    _logger.Information(service.ServiceName + " çalışıyor.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message);
+            }
+
         }
     }
 }

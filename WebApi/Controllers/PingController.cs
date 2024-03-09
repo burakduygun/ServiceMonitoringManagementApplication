@@ -7,12 +7,6 @@ namespace WebApi.Controllers
     [ApiController]
     public class PingController : ControllerBase
     {
-        //private readonly AbstractLogger _logger;
-        //public PingController(AbstractLogger logger)
-        //{
-        //    _logger = logger;
-        //}
-
         private readonly ILogger<PingController> _logger;
 
         public PingController(ILogger<PingController> logger)
@@ -23,7 +17,6 @@ namespace WebApi.Controllers
         [HttpGet]
         public string Ping()
         {
-            //_logger.Info("Ping get isteği geldi.");
             _logger.LogInformation("Ping get isteği geldi.");
             return "Ping başarılı";
         }

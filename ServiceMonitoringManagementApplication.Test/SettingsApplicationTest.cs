@@ -1,8 +1,5 @@
 using SettingsApplication;
 using SettingsApplication.Settings;
-using Shared.Logging;
-using Shared.Services;
-using System.Text.Json;
 
 namespace ServiceMonitoringManagementApplication.Test
 {
@@ -13,13 +10,13 @@ namespace ServiceMonitoringManagementApplication.Test
         public void SaveButton_Click_ShouldUpdateJsonFile()
         {
             // Arrange
-            var form = new frm_settings();
+            var settingsManager = new SettingsManager("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");
             var initialServiceSettings = Shared.Services.FileAccess.LoadServiceSettings("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");
-            var selectedServiceSetting = form._settingsManager.GetServiceSettingByName("MockWindows");
+            var selectedServiceSetting = settingsManager.GetServiceSettingByName("MockWindows");
 
             // Act
             selectedServiceSetting.Frequency = 10;
-            form._settingsManager.UpdateServiceSetting(selectedServiceSetting);
+            settingsManager.UpdateServiceSetting(selectedServiceSetting);
 
             // Assert
             var updatedServiceSettings = Shared.Services.FileAccess.LoadServiceSettings("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json");

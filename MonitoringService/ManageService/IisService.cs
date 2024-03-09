@@ -13,66 +13,96 @@ namespace MonitoringService.ManageService
     {
         private readonly string _serviceName;
         private readonly string _pingUrl;
-        //private readonly AbstractLogger _logger;
         private readonly ILogger _logger;
+
+        public string ServiceName { get; }
 
         public IisService(string serviceName, string pingUrl, ILogger logger)
         {
             _serviceName = serviceName;
+            ServiceName = serviceName;
             _pingUrl = pingUrl;
             _logger = logger;
         }
 
-        public async Task CheckStatus()
+        //public async Task CheckStatusssss()
+        //{
+        //    try
+        //    {
+        //        //using (var httpClient = new HttpClient())
+        //        //{
+        //        //    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
+        //        //    //var server = new ServerManager();
+        //        //    //var state = server.ApplicationPools["WebApi"].State;
+        //        //    //state == ObjectState.Started;
+
+        //        //    var response = await httpClient.GetAsync(_pingUrl);
+
+        //        //    if (response.IsSuccessStatusCode)
+        //        //    {
+        //        //        _logger.Information($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
+        //        //    }
+        //        //}
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.Error($"Hata: {ex.InnerException.Message}");
+
+        //        RestartService();
+
+        //        _logger.Information($"{_serviceName} başlatıldı.");
+        //    }
+        //}
+
+        public bool CheckStatus()
         {
+            //return Task.Run(() =>
+            //{
+            //    return true;
+            //});
+
+            //var server = new ServerManager();
+            //var state = server.ApplicationPools[_serviceName].State;
+            //var asd = state == ObjectState;
+            //_logger.Information("iisservice " + asd.ToString());
+            //return state == ObjectState.Started;
+
             try
             {
                 using (var httpClient = new HttpClient())
                 {
-                    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
-                    //var server = new ServerManager();
-                    //var state = server.ApplicationPools["WebApi"].State;
-                    //state == ObjectState.Started;
+                    var task = httpClient.GetAsync(_pingUrl);
+                    var response = task.Result;
 
-                    var response = await httpClient.GetAsync(_pingUrl);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        //_logger.Info($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
-                        _logger.Information($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
-                    }
+                    return response.StatusCode == HttpStatusCode.OK;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //_logger.Error($"Hata: {ex.InnerException.Message}");
-                _logger.Error($"Hata: {ex.InnerException.Message}");
-
-                RestartService();
-
-                //_logger.Info($"{_serviceName} başlatıldı.");
-                _logger.Information($"{_serviceName} başlatıldı.");
+                return false;
             }
+         
         }
 
-        private void RestartService()
+        public void RestartService()
         {
             try
             {
+                ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
                 var server = new ServerManager();
                 var site = server.Sites.FirstOrDefault(s => s.Name == _serviceName);
 
                 if (site != null)
                 {
                     site.Start();
-                    //_logger.Info($"{_serviceName} servisi yeniden başlatılıyor.");
                     _logger.Information($"{_serviceName} servisi yeniden başlatılıyor.");
                 }
             }
             catch (Exception ex)
             {
-                //_logger.Error($"Hata: {ex.Message}");
                 _logger.Error($"Hata: {ex.Message}");
             }
         }
