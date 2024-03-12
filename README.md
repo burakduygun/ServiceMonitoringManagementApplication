@@ -4,9 +4,8 @@ The project checks the status of the relevant services at specified intervals, a
 
 ## Technologies and Tools
 
-- Teknolojiler ve Araçlar
 - C#
-- Windows Servisleri
+- Windows Service
 - IIS
 - Winforms
 - Swagger
