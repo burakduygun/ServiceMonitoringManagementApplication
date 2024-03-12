@@ -19,10 +19,11 @@ namespace MonitoringService
 {
     public partial class Service1 : ServiceBase
     {
-        public List<Timer> timers = new List<Timer>();
+        private List<Timer> timers = new List<Timer>();
         private readonly ILogger _logger;
+        private FileSystemWatcher watcher;
+        private string filePath = Shared.PathAccess.ServiceSettingsPath;
 
-        private string filePath = ConfigurationManager.AppSettings["ServiceSettingsPath"];
         public Service1(ILogger logger)
         {
             _logger = logger;
@@ -30,6 +31,30 @@ namespace MonitoringService
         }
 
         protected override void OnStart(string[] args)
+        {
+            StartMonitoringService();
+        }
+
+        protected override void OnStop()
+        {
+            StopMonitoringService();
+        }
+
+        public FileSystemWatcher GetWatcher()
+        {
+            return watcher;
+        }
+
+        public List<Timer> GetTimers()
+        {
+            return timers;
+        }
+        public void SetTimer(Timer timer)
+        {
+            timers.Add(timer);
+        }
+
+        public void StartMonitoringService()
         {
             try
             {
@@ -39,7 +64,8 @@ namespace MonitoringService
 
                 _logger.Information("Monitoring servis başlatılıyor.");
 
-                FileSystemWatcher watcher = new FileSystemWatcher();
+                //FileSystemWatcher watcher = new FileSystemWatcher();
+                watcher = new FileSystemWatcher();
                 watcher.Path = Path.GetDirectoryName(filePath);
                 watcher.Filter = Path.GetFileName(filePath);
                 watcher.NotifyFilter = NotifyFilters.LastWrite;
@@ -52,17 +78,18 @@ namespace MonitoringService
             }
         }
 
-        protected override void OnStop()
+        public void StopMonitoringService()
         {
             foreach (var timer in timers)
             {
                 timer.Stop();
                 timer.Dispose();
             }
+            timers.Clear();
             _logger.Information("Monitoring servis durduruldu.");
         }
 
-        private void OnSettingsFileChanged(object source, FileSystemEventArgs e)
+        public void OnSettingsFileChanged(object source, FileSystemEventArgs e)
         {
             try
             {
@@ -117,7 +144,7 @@ namespace MonitoringService
             }
         }
 
-        private void CheckService(IService service, int tryCount)
+        public void CheckService(IService service, int tryCount)
         {
             try
             {

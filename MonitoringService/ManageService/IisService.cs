@@ -25,49 +25,8 @@ namespace MonitoringService.ManageService
             _logger = logger;
         }
 
-        //public async Task CheckStatusssss()
-        //{
-        //    try
-        //    {
-        //        //using (var httpClient = new HttpClient())
-        //        //{
-        //        //    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-
-        //        //    //var server = new ServerManager();
-        //        //    //var state = server.ApplicationPools["WebApi"].State;
-        //        //    //state == ObjectState.Started;
-
-        //        //    var response = await httpClient.GetAsync(_pingUrl);
-
-        //        //    if (response.IsSuccessStatusCode)
-        //        //    {
-        //        //        _logger.Information($"{_pingUrl} servisi erişilebilir durumda. {response.StatusCode}.");
-        //        //    }
-        //        //}
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.Error($"Hata: {ex.InnerException.Message}");
-
-        //        RestartService();
-
-        //        _logger.Information($"{_serviceName} başlatıldı.");
-        //    }
-        //}
-
         public bool CheckStatus()
         {
-            //return Task.Run(() =>
-            //{
-            //    return true;
-            //});
-
-            //var server = new ServerManager();
-            //var state = server.ApplicationPools[_serviceName].State;
-            //var asd = state == ObjectState;
-            //_logger.Information("iisservice " + asd.ToString());
-            //return state == ObjectState.Started;
-
             try
             {
                 using (var httpClient = new HttpClient())

@@ -2,6 +2,7 @@
 using Shared.Logging;
 using Shared.Services;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,8 +13,8 @@ namespace SettingsApplication
     public partial class frm_settings : Form
     {
         public readonly SettingsManager _settingsManager;
-        //string serviceSettingsPath = ConfigurationManager.AppSettings["ServiceSettingsPath"]!;
-        string serviceSettingsPath = "C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop\\settings\\servicesettings.json";
+        private string serviceSettingsPath = Shared.PathAccess.ServiceSettingsPath;
+
         public frm_settings()
         {
             InitializeComponent();

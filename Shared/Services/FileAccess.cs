@@ -15,15 +15,10 @@ namespace Shared.Services
                 string jsonContent = reader.ReadToEnd();
                 return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
             }
-            //string jsonContent = File.ReadAllText(filePath);
-            //return JsonSerializer.Deserialize<List<ServiceSettings>>(jsonContent);
         }
 
         public static void SaveServiceSettings(List<ServiceSettings> serviceSettings, string filePath)
         {
-            //string jsonString = JsonSerializer.Serialize(serviceSettings);
-            //File.WriteAllText(filePath, jsonString);
-
             string jsonString = JsonSerializer.Serialize(serviceSettings);
             using (StreamWriter streamWriter = new StreamWriter(filePath))
             {
