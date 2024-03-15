@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+﻿using Serilog;
 using Shared.Logging;
-using Shared.Logging.Loggers;
+using Shared.Services;
+using System.Text.Json;
+using System.Xml;
+using System.Xml.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,25 +14,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var minLogLevel = LoggerHelper.GetLogLevel("WebApi");
+
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .MinimumLevel.Is(minLogLevel)
     .Enrich.FromLogContext()
     .CreateLogger();
+
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
-
-//var fileLoggingSettings = builder.Configuration.GetSection("FileLogging");
-
-//builder.Services.AddSingleton<AbstractLogger>(l =>
-//{
-//    //abstract logger istenirse filelogger versin diye hem dependency inversion hem de singleton uygulanıyor
-//    //var logger = new FileLogger("C:\\Users\\Burak.Duygun\\OneDrive - Logo\\Desktop", "webapi");
-//    var logger = new FileLogger(fileLoggingSettings["Path"], fileLoggingSettings["ServiceName"]);
-//    //logger.SetLogLevel(Shared.Logging.LogLevel.Info);
-//    logger.SetLogLevel(Enum.Parse<Shared.Logging.LogLevel>(fileLoggingSettings["LogLevel"]));
-
-//    return logger;
-//});
 
 var app = builder.Build();
 

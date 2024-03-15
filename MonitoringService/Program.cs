@@ -1,6 +1,4 @@
 ﻿using System.ServiceProcess;
-using System.Configuration;
-using System;
 using Serilog;
 
 namespace MonitoringService

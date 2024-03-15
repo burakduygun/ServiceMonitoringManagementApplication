@@ -1,21 +1,12 @@
-using SettingsApplication;
 using SettingsApplication.Settings;
-using System.Configuration;
-using System.Reflection;
-
 
 namespace ServiceMonitoringManagementApplication.Test
 {
-
     public class SettingsApplicationTest
     {
         [Fact]
         public void SaveButton_Click_ShouldUpdateJsonFile()
         {
-            //Assembly me = Assembly.GetExecutingAssembly();
-            //Configuration config = ConfigurationManager.OpenExeConfiguration(me.ManifestModule.Assembly.Location);
-            //string serviceSettingsPath = config.AppSettings.Settings["ServiceSettingsPath"].Value;
-
             // Arrange
             string serviceSettingsPath = Shared.PathAccess.ServiceSettingsPath;
             var settingsManager = new SettingsManager(serviceSettingsPath);
@@ -30,6 +21,5 @@ namespace ServiceMonitoringManagementApplication.Test
             var updatedServiceSettings = Shared.Services.FileAccess.LoadServiceSettings(serviceSettingsPath);
             Assert.NotEqual(initialServiceSettings, updatedServiceSettings);
         }
-
     }
 }

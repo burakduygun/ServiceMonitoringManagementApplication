@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using MonitoringService;
+﻿using MonitoringService;
 using MonitoringService.ManageService;
 using Moq;
 using Serilog;
-using Microsoft.Web.Administration;
-using System.Net.Http;
-using System.Net;
-using System.Diagnostics.CodeAnalysis;
 using Shared.Services;
 using Shared.Logging;
 

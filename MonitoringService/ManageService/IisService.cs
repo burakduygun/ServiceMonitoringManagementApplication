@@ -1,11 +1,12 @@
 ﻿using Microsoft.Web.Administration;
-using Shared.Logging;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net;
-using System.Threading.Tasks;
 using Serilog;
+using Shared.Services;
+using System.Text.Json;
+using System.IO;
 
 namespace MonitoringService.ManageService
 {
@@ -14,15 +15,16 @@ namespace MonitoringService.ManageService
         private readonly string _serviceName;
         private readonly string _pingUrl;
         private readonly ILogger _logger;
-
+        private readonly ServiceSettings _settings;
         public string ServiceName { get; }
 
-        public IisService(string serviceName, string pingUrl, ILogger logger)
+        public IisService(ServiceSettings serviceSetting, ILogger logger)
         {
-            _serviceName = serviceName;
-            ServiceName = serviceName;
-            _pingUrl = pingUrl;
+            _serviceName = serviceSetting.ServiceName;
+            ServiceName = serviceSetting.ServiceName;
+            _pingUrl = serviceSetting.PingUrl;
             _logger = logger;
+            _settings = serviceSetting;
         }
 
         public bool CheckStatus()
@@ -42,7 +44,7 @@ namespace MonitoringService.ManageService
             {
                 return false;
             }
-         
+
         }
 
         public void RestartService()

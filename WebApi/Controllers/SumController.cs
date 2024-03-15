@@ -20,6 +20,5 @@ namespace WebApi.Controllers
             _logger.LogInformation("Sum get isteği geldi.");
             return x + y;
         }
-
     }
 }

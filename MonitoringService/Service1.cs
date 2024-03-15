@@ -1,19 +1,13 @@
 ﻿using System;
-using Shared.Logging;
 using System.ServiceProcess;
 using System.Timers;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Net;
-using Microsoft.Web.Administration;
-using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using Shared.Services;
-using System.Text.Json;
-using System.Configuration;
 using MonitoringService.ManageService;
 using Serilog;
+using Serilog.Events;
+using System.Configuration;
 
 namespace MonitoringService
 {
@@ -44,7 +38,6 @@ namespace MonitoringService
         {
             return watcher;
         }
-
         public List<Timer> GetTimers()
         {
             return timers;
@@ -64,7 +57,6 @@ namespace MonitoringService
 
                 _logger.Information("Monitoring servis başlatılıyor.");
 
-                //FileSystemWatcher watcher = new FileSystemWatcher();
                 watcher = new FileSystemWatcher();
                 watcher.Path = Path.GetDirectoryName(filePath);
                 watcher.Filter = Path.GetFileName(filePath);
@@ -122,11 +114,11 @@ namespace MonitoringService
 
                     if (serviceSetting.ServiceType == Shared.Services.ServiceType.IIS)
                     {
-                        service = new IisService(serviceSetting.ServiceName, serviceSetting.PingUrl, _logger);
+                        service = new IisService(serviceSetting, _logger);
                     }
                     else
                     {
-                        service = new MockWindowsService(serviceSetting.ServiceName, _logger);
+                        service = new MockWindowsService(serviceSetting, _logger);
                     }
 
                     timer.Elapsed += (object sender, ElapsedEventArgs e) =>
@@ -168,7 +160,6 @@ namespace MonitoringService
             {
                 _logger.Error(ex.Message);
             }
-
         }
     }
 }

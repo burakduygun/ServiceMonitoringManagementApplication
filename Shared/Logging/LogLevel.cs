@@ -2,12 +2,11 @@
 {
     public enum LogLevel
     {
-        Trace,
+        Verbose,
         Debug,
-        Info,
-        Warn,
+        Information,
+        Warning,
         Error,
-        Fatal,
-        Off
+        Fatal
     }
 }

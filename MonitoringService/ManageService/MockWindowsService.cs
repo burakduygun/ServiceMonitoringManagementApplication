@@ -1,10 +1,8 @@
 ﻿using Serilog;
-using Shared.Logging;
-using System;
-using System.Linq;
+using Shared.Services;
+using System.Runtime;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 
 namespace MonitoringService.ManageService
 {
@@ -12,13 +10,15 @@ namespace MonitoringService.ManageService
     {
         private readonly string _serviceName;
         private readonly ILogger _logger;
+        private readonly ServiceSettings _settings;
         public string ServiceName { get; }
 
-        public MockWindowsService(string serviceName, ILogger logger)
+        public MockWindowsService(ServiceSettings serviceSetting, ILogger logger)
         {
-            _serviceName = serviceName;
+            _serviceName = serviceSetting.ServiceName;
             _logger = logger;
-            ServiceName = serviceName;
+            ServiceName = serviceSetting.ServiceName;
+            _settings = serviceSetting;
         }
 
         public void RestartService()
@@ -27,7 +27,6 @@ namespace MonitoringService.ManageService
             sc.Start();
             sc.WaitForStatus(ServiceControllerStatus.Running);
         }
-
         public bool CheckStatus()
         {
             ServiceController sc = new ServiceController(_serviceName);

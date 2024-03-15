@@ -9,6 +9,7 @@ namespace MockWindows
     public partial class Service1 : ServiceBase
     {
         private readonly ILogger _logger;
+
         private readonly string _watchingPath;
         public Service1(ILogger logger, string watchingPath)
         {

@@ -1,7 +1,4 @@
 ﻿using Shared.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Shared.Services
 {
@@ -11,6 +8,7 @@ namespace Shared.Services
         public ServiceType ServiceType { get; set; }
         public LogLevel LogLevel { get; set; }
         public int Frequency { get; set; }
-        public string PingUrl { get; set; } 
+        public string PingUrl { get; set; }
+        //public string SettingsPath { get; set; }
     }
 }

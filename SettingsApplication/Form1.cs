@@ -1,12 +1,6 @@
 ﻿using SettingsApplication.Settings;
 using Shared.Logging;
 using Shared.Services;
-using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Windows.Forms;
 
 namespace SettingsApplication
 {
@@ -21,17 +15,22 @@ namespace SettingsApplication
 
             _settingsManager = new SettingsManager(serviceSettingsPath);
 
-            PopulateServiceInfoComboBox();
+            PopulateComboBox();
             btn_save.Enabled = false;
         }
 
-        private void PopulateServiceInfoComboBox()
+        private void PopulateComboBox()
         {
             var serviceSettings = Shared.Services.FileAccess.LoadServiceSettings(serviceSettingsPath);
 
             foreach (var servicesetting in serviceSettings)
             {
                 cmb_serviceInfo.Items.Add(servicesetting.ServiceName);
+            }
+
+            foreach (var loglevel in Enum.GetValues(typeof(LogLevel)))
+            {
+                cmb_logLevel.Items.Add(loglevel);
             }
         }
 
@@ -50,8 +49,7 @@ namespace SettingsApplication
             if (selectedServiceSetting != null)
             {
                 selectedServiceSetting.Frequency = (int)nupViewingFrequency.Value;
-                if (selectedServiceSetting.ServiceType == ServiceType.IIS)
-                    selectedServiceSetting.PingUrl = txt_url.Text;
+                selectedServiceSetting.LogLevel = Enum.Parse<LogLevel>(cmb_logLevel.Text);
             }
 
             _settingsManager.UpdateServiceSetting(selectedServiceSetting!);
@@ -65,6 +63,7 @@ namespace SettingsApplication
         private void ClearFormFields()
         {
             cmb_serviceInfo.Text = "";
+            cmb_logLevel.Text = "";
             nupViewingFrequency.Value = 0;
             txt_url.Text = "";
         }
@@ -91,7 +90,8 @@ namespace SettingsApplication
 
                 nupViewingFrequency.Value = selectedServiceSetting.Frequency;
 
-                txt_logLevel.Text = selectedServiceSetting.LogLevel.ToString();
+                cmb_logLevel.Text = selectedServiceSetting.LogLevel.ToString();
+
             }
             CheckFormCompletion();
         }
@@ -103,7 +103,7 @@ namespace SettingsApplication
 
         public void CheckFormCompletion()
         {
-            if (!string.IsNullOrWhiteSpace(txt_logLevel.Text) &&
+            if (!string.IsNullOrWhiteSpace(cmb_logLevel.Text) &&
                 !string.IsNullOrWhiteSpace(cmb_serviceInfo.Text) &&
                 nupViewingFrequency.Value > 0)
             {
